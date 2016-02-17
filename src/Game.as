@@ -45,7 +45,7 @@ package
 				
 				case "about":
 					screenWelcome.disposeTemporarily();
-					screenAbout.initialize();
+					screenInGame.initialize();
 					break;
 			}
 		}
