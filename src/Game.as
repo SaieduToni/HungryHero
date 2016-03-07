@@ -2,9 +2,8 @@ package
 {
 	import events.NavigationEvent;
 	
-	import screens.InGame;
 	import screens.Welcome;
-	
+	import screens.InGame;
 	import starling.display.Sprite;
 	import starling.events.Event;
 	

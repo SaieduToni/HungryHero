@@ -38,12 +38,12 @@
     <SubTexture name="item5" x="768" y="774" width="26" height="25"/>
     <SubTexture name="item6" x="796" y="774" width="56" height="55"/>
     <SubTexture name="item7" x="854" y="774" width="57" height="55"/>
-    <SubTexture name="obstacle1" x="2" y="878" width="139" height="53"/>
-    <SubTexture name="obstacle1_crash" x="143" y="878" width="94" height="58"/>
+    <SubTexture name="obstacle3" x="2" y="878" width="139" height="53"/>
+    <SubTexture name="obstacle3_crash" x="143" y="878" width="94" height="58"/>
     <SubTexture name="obstacle2" x="239" y="878" width="79" height="71"/>
     <SubTexture name="obstacle2_crash" x="320" y="878" width="61" height="75"/>
-    <SubTexture name="obstacle3" x="383" y="878" width="137" height="72"/>
-    <SubTexture name="obstacle3_crash" x="522" y="878" width="102" height="80"/>
+    <SubTexture name="obstacle1" x="383" y="878" width="137" height="72"/>
+    <SubTexture name="obstacle1_crash" x="522" y="878" width="102" height="80"/>
     <SubTexture name="obstacle4_0001" x="626" y="878" width="145" height="61"/>
     <SubTexture name="obstacle4_0002" x="773" y="878" width="143" height="61" frameX="-2" frameY="0" frameWidth="145" frameHeight="61"/>
     <SubTexture name="obstacle4_crash" x="918" y="878" width="95" height="66"/>
