@@ -30,7 +30,7 @@ package
 
 			screenWelcome = new Welcome();
 			this.addChild(screenWelcome);
-			screenWelcome.initialize()
+			screenWelcome.initialize();
 		}
 		
 		private function onChangeScreen(event:NavigationEvent):void
@@ -45,6 +45,11 @@ package
 				case "about":
 					screenWelcome.disposeTemporarily();
 					screenInGame.initialize();
+					break;
+				
+				case "welcome":
+					screenInGame.disposeTemporarily();
+					screenWelcome.initialize();
 					break;
 			}
 		}

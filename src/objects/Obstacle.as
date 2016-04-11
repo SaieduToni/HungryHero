@@ -1,10 +1,12 @@
 package objects
 {
+	import screens.InGame;
+	
+	import starling.core.Starling;
 	import starling.display.Image;
 	import starling.display.MovieClip;
 	import starling.display.Sprite;
 	import starling.events.Event;
-	import starling.core.Starling;
 	
 	public class Obstacle extends Sprite
 	{
@@ -18,6 +20,7 @@ package objects
 		private var obstacleCrashImage:Image;
 		private var obstacleAnimation:MovieClip;
 		private var watchOutAnimation:MovieClip;
+		private var gameOver:InGame;
 		
 		public function Obstacle(_type:int, _distance:int, _watchOut:Boolean = true, _speed:int = 0)
 		{	
@@ -121,6 +124,12 @@ package objects
 				watchOutAnimation.y = obstacleImage.y + (obstacleImage.texture.height * 0.5) - (watchOutAnimation.texture.height * 0.5);
 			}
 			this.addChild(watchOutAnimation);
+			
+			if (gameOver == true)
+			{
+				removeChild(watchOutAnimation);
+			}
+
 		}
 		
 		private function createObstacleCrashArt():void

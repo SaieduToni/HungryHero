@@ -4,10 +4,13 @@ package screens
 	
 	import events.NavigationEvent;
 	
+	import screens.InGame;
+	
 	import starling.display.Button;
 	import starling.display.Image;
 	import starling.display.Sprite;
 	import starling.events.Event;
+	import starling.text.TextField;
 	
 	public class Welcome extends Sprite
 	{
@@ -17,6 +20,12 @@ package screens
 		
 		private var playBtn:Button;
 		private var aboutBtn:Button;
+		
+		private var scoreText:TextField;
+		
+		private var scoreDistance:InGame;
+		private var endScore:InGame;
+		private var finalScore:int;
 		
 		public function Welcome()
 		{
@@ -29,10 +38,17 @@ package screens
 			trace("welcome screen initialized");
 			
 			drawScreen();
+			
+			scoreText = new TextField(300, 100, "Score: " , "MyFontName", 24, 0xffffff);
+			this.addChild(scoreText);
+			
+			finalScore = Number(scoreDistance);
+			
+			scoreText.text = "Score:" + finalScore;
 		}
 		
 		private function drawScreen():void
-		{
+		{	
 			bg = new Image(Assets.getTexture("BgWelcome"));
 			this.addChild(bg);
 			
@@ -55,8 +71,9 @@ package screens
 			aboutBtn.x = 410;
 			aboutBtn.y = 380;
 			this.addChild(aboutBtn);
+
+			this.addEventListener(Event.TRIGGERED, onMainMenuClick);	
 			
-			this.addEventListener(Event.TRIGGERED, onMainMenuClick);
 		}
 		
 		private function onMainMenuClick(event:Event):void
@@ -97,3 +114,4 @@ package screens
 		}
 	}
 }
+

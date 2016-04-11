@@ -1,5 +1,7 @@
 package screens
 {
+	import events.NavigationEvent;
+	
 	import flash.geom.Rectangle;
 	import flash.utils.getTimer;
 	
@@ -7,12 +9,16 @@ package screens
 	import objects.Hero;
 	import objects.Item;
 	import objects.Obstacle;
+	import objects.Particle;
 	
 	import starling.display.Button;
 	import starling.display.Sprite;
 	import starling.events.Event;
 	import starling.events.Touch;
 	import starling.events.TouchEvent;
+	import starling.text.TextField;
+	import starling.utils.HAlign;
+	import starling.utils.VAlign;
 	import starling.utils.deg2rad;
 	
 	public class InGame extends Sprite
@@ -41,6 +47,20 @@ package screens
 		
 		private var obstaclesToAnimate:Vector.<Obstacle>;
 		private var itemsToAnimate:Vector.<Item>;
+		private var eatParticlesToAnimate:Vector.<Particle>;
+		
+		private var scoreText:TextField;
+		private var livesText:TextField;
+		
+		private var playerLives:Number;
+		
+		private var screenWelcome:Welcome;
+		private var screenInGame:InGame;
+		
+		public static var gameOver:Boolean;
+		
+		public var endScore:int = scoreDistance;
+
 			
 		public function InGame()
 		{
@@ -51,9 +71,17 @@ package screens
 		{
 			this.removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 			drawGame();
+			
+			scoreText = new TextField(300, 100, "Score: ", "MyFontName", 24, 0xffffff);
+			this.addChild(scoreText);
+			
+			livesText = new TextField(800, 100, "Lives: ", "MyFontname", 24, 0xffffff);
+			this.addChild(livesText);
 		}
 		private function drawGame():void
-		{
+		{	
+			gameOver = false;
+			
 			bg = new GameBackground();
 			this.addChild(bg);
 			
@@ -83,10 +111,12 @@ package screens
 			hero.x = -stage.stageWidth;
 			hero.y = stage.stageHeight * 0.5;
 			
+			
 			gameState = "idle";
 			
 			playerSpeed = 0;
 			hitObstacle = 0;
+			playerLives = 1;
 			
 			bg.speed = 0;
 			scoreDistance = 0;
@@ -94,6 +124,7 @@ package screens
 			
 			obstaclesToAnimate = new Vector.<Obstacle>();
 			itemsToAnimate = new Vector.<Item>();
+			eatParticlesToAnimate = new Vector.<Particle>();
 			
 			startButton.addEventListener(Event.TRIGGERED, onStartButtonClick);
 		}
@@ -165,6 +196,8 @@ package screens
 					{
 						hitObstacle--;
 						cameraShake();
+						scoreDistance--;
+						
 						
 					}
 					
@@ -173,16 +206,50 @@ package screens
 					
 					scoreDistance += (playerSpeed * elapsed) * 0.1;
 					
+					scoreText.text = "Score: " + scoreDistance;
+					livesText.text = "Lives: " + playerLives;
+					
 					initObstacle();
 					animateObstacles();
 					
 					createFoodItems();
 					animateItems();
+					animateEatParticles();
 					
 					break;
 				case "over":
 					break;
 			}
+		}
+		
+		private function animateEatParticles():void
+		{
+			for(var i:uint = 0;i<eatParticlesToAnimate.length;i++)
+				{
+					var eatParticleToTrack:Particle = eatParticlesToAnimate[i];
+					
+					if (eatParticleToTrack)
+					{
+						eatParticleToTrack.scaleX -= 0.03;
+						eatParticleToTrack.scaleY = eatParticleToTrack.scaleX;
+						
+						eatParticleToTrack.y -= eatParticleToTrack.speedY;
+						eatParticleToTrack.speedY -= eatParticleToTrack.speedY * 0.2;
+						
+						eatParticleToTrack.x += eatParticleToTrack.speedX;
+						eatParticleToTrack.speedX--;
+						
+						eatParticleToTrack.rotation += deg2rad(eatParticleToTrack.spin);
+						eatParticleToTrack.spin *= 1.1;
+						
+						if (eatParticleToTrack.scaleY <= 0.02)
+						{
+							eatParticlesToAnimate.splice(i, 1);
+							this.removeChild(eatParticleToTrack);
+							eatParticleToTrack = null;
+						}
+					}
+				}
 		}
 		
 		private function animateItems():void
@@ -197,6 +264,10 @@ package screens
 				
 				if (itemToTrack.bounds.intersects(hero.bounds))
 				{
+					createEatParticles(itemToTrack);
+					
+					scoreDistance= scoreDistance + 10
+					
 					itemsToAnimate.splice(i,1);
 					this.removeChild(itemToTrack);
 				}
@@ -206,6 +277,34 @@ package screens
 					itemsToAnimate.splice(i,1);
 					this.removeChild(itemToTrack);
 				}
+				if (playerLives == 0)
+				{
+					itemsToAnimate.splice(i,1);
+					removeChild(itemToTrack);
+				}
+			}
+		}
+		
+		private function createEatParticles(itemToTrack:Item):void
+		{
+			var count:int = 5;
+			
+			while (count > 0)
+			{
+				count--;
+				var eatParticle:Particle = new Particle();
+				this.addChild(eatParticle);
+				
+				eatParticle.x = itemToTrack.x + Math.random() * 40 - 20;
+				eatParticle.y = itemToTrack.y - Math.random() * 40;
+				
+				eatParticle.speedX = Math.random() * 2 + 1;
+				eatParticle.speedY = Math.random() * 5;
+				eatParticle.spin = Math.random() * 15
+				
+				eatParticle.scaleX = eatParticle.scaleY = Math.random() * 0.3 + 0.3;
+				
+				eatParticlesToAnimate.push(eatParticle);
 			}
 		}
 		
@@ -250,7 +349,14 @@ package screens
 					obstacleToTrack.rotation = deg2rad(70);
 					hitObstacle = 30;
 					playerSpeed *= 0.5;
+					playerLives--;
+					livesText.text = "Lives: " + playerLives;
 					
+					if (playerLives == 0)
+					{
+						endScore = scoreDistance;
+						this.dispatchEvent(new NavigationEvent(NavigationEvent.CHANGE_SCREEN, {id: "welcome"}, true));
+					}
 				}
 				
 				if (obstacleToTrack.distance > 0)
@@ -269,6 +375,11 @@ package screens
 				{
 					obstaclesToAnimate.splice(i, 1);
 					this.removeChild(obstacleToTrack);
+				}
+				if (playerLives == 0)
+				{
+					obstaclesToAnimate.splice(i, 1);
+					removeChild(obstacleToTrack);
 				}
 			}
 		}
@@ -319,6 +430,11 @@ package screens
 			timePrevious = timeCurrent;
 			timeCurrent = getTimer();
 			elapsed = (timeCurrent - timePrevious) * 0.001;
+		}
+		
+		private function gameOver():void
+		{
+			gameOver = true;
 		}
 	}
 }
